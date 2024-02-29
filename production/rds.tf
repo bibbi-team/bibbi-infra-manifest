@@ -10,12 +10,12 @@ resource "aws_rds_cluster" "common_prod" {
   master_password                 = random_password.rng-prod.result
   backup_retention_period         = 3
   engine                          = "aurora-mysql"
-  engine_version                  = "8.0.mysql_aurora.3.04.1"
+  engine_version                  = "8.0.mysql_aurora.3.05.2"
   skip_final_snapshot = true
 
   serverlessv2_scaling_configuration {
     max_capacity = 4
-    min_capacity = 0.5
+    min_capacity = 1
   }
 
   lifecycle {
@@ -76,8 +76,8 @@ resource "aws_security_group_rule" "prod_db_sg" {
   from_port                = 3306
   to_port                  = 3306
   protocol                 = "tcp"
-  cidr_blocks = ["0.0.0.0/0"]
-  description              = "from repository client prod"
+  cidr_blocks = [local.vpc_cidr]
+  description              = "allow access from same vpc"
 }
 
 output "common_prod_passwd" {
