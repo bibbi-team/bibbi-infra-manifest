@@ -26,8 +26,8 @@ resource "aws_secretsmanager_secret_version" "bibbi-ecs-secret-version" {
 resource "aws_ecs_task_definition" "bibbi-backend" {
   family = "bibbi-backend-prod"
   network_mode             = "awsvpc"
-  cpu                      = 1024
-  memory                   = 2048
+  cpu                      = 2048
+  memory                   = 4096
   requires_compatibilities = ["FARGATE"]
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   depends_on = [aws_secretsmanager_secret_version.bibbi-ecs-secret-version]
@@ -40,8 +40,8 @@ resource "aws_ecs_task_definition" "bibbi-backend" {
     {
       name      = "api"
       image     = local.ecs_image_url
-      cpu       = 1024
-      memory    = 2048
+      cpu       = 2048
+      memory    = 4096
       essential = true
       portMappings = [
         {
