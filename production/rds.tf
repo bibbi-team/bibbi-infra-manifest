@@ -9,8 +9,8 @@ resource "aws_rds_cluster" "common_prod" {
   master_username                 = "admin"
   master_password                 = random_password.rng-prod.result
   backup_retention_period         = 3
-  engine                          = "mariadb"
-  engine_version                  = "10.11.6"
+  engine                          = "aurora-mysql"
+  engine_version                  = "8.0.mysql_aurora.3.04.1"
   skip_final_snapshot = true
 
   serverlessv2_scaling_configuration {
@@ -36,7 +36,7 @@ resource "aws_rds_cluster" "common_prod" {
 resource "aws_rds_cluster_instance" "common_prod_1" {
   identifier         = "bibbi-instance-prod-1"
   cluster_identifier = aws_rds_cluster.common_prod.id
-  instance_class     = "db.t3.micro"
+  instance_class     = "db.serverless"
   engine             = aws_rds_cluster.common_prod.engine
   engine_version     = aws_rds_cluster.common_prod.engine_version
 }
