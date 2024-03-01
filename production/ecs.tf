@@ -105,6 +105,19 @@ data "aws_iam_policy_document" "secret_manager_policy" {
   }
 }
 
+resource "aws_iam_role_policy" "ecs_log_group_policy" {
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy     = data.aws_iam_policy_document.log_group_policy.json
+}
+
+data "aws_iam_policy_document" "log_group_policy" {
+  statement {
+    effect = "Allow"
+    actions   = ["logs:CreateLogGroup"]
+    resources = ["*"]
+  }
+}
+
 
 resource "aws_ecs_service" "bibbi-backend" {
   name            = "bibbi-backend"
