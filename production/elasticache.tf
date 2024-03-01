@@ -27,6 +27,7 @@ resource "aws_security_group" "elc-sg" {
   }
 }
 
+# 인바운드 수정 필요
 resource "aws_security_group_rule" "ingress_redis" {
   security_group_id = aws_security_group.elc-sg.id
   type              = "ingress"
