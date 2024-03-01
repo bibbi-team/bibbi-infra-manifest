@@ -128,6 +128,13 @@ resource "aws_ecs_service" "bibbi-backend" {
   launch_type     = "FARGATE"
   health_check_grace_period_seconds = 30
   #depends_on      = [aws_iam_role_policy.foo]
+
+  lifecycle {
+    ignore_changes = [
+      task_definition
+    ]
+  }
+
   deployment_circuit_breaker {
     enable = true
     rollback = true
