@@ -1,20 +1,21 @@
-resource "aws_elasticache_cluster" "bibbi-elc" {
-  cluster_id           = "bibbi-redis"
-  engine               = "redis"
-  engine_version       = "7.0"
-  node_type            = "cache.t2.micro"
-  num_cache_nodes      = 1
-  port                 = 6379
-  parameter_group_name = "default.redis7"
-}
-
-resource "aws_elasticache_subnet_group" "elc-subnet" {
-  name       = "bibbi-elc-subnet"
-  subnet_ids = aws_subnet.private.*.id
-
-  tags = {
-    Name = "Elc subnet group"
+resource "aws_elasticache_serverless_cache" "bibbi-elc" {
+  engine = "redis"
+  name   = "bibbi-redis"
+  cache_usage_limits {
+    data_storage {
+      maximum = 10
+      unit    = "GB"
+    }
+    ecpu_per_second {
+      maximum = 5000
+    }
   }
+  daily_snapshot_time      = "09:00"
+  description              = "BiBBi Prod Elasticache"
+  major_engine_version     = "7"
+  snapshot_retention_limit = 1
+  security_group_ids       = [aws_security_group.elc-sg.id]
+  subnet_ids               = aws_subnet.private[*].id
 }
 
 resource "aws_security_group" "elc-sg" {
@@ -34,19 +35,8 @@ resource "aws_security_group_rule" "ingress_redis" {
   from_port         = 6379
   to_port           = 6379
   protocol          = "TCP"
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks       = [local.vpc_cidr]
   description       = "allow incoming traffic on TCP 6379"
-}
-
-# 인바운드 수정 필요
-resource "aws_security_group_rule" "ingress_ssh" {
-  security_group_id = aws_security_group.elc-sg.id
-  type              = "ingress"
-  from_port         = 22
-  to_port           = 22
-  protocol          = "TCP"
-  cidr_blocks       = ["0.0.0.0/0"]
-  description       = "allow incoming SSH traffic"
 }
 
 resource "aws_security_group_rule" "egress_all" {
