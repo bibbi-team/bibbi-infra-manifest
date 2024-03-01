@@ -46,23 +46,6 @@ resource "aws_security_group" "allow_ovpn" {
   description = "Allow OVPN Dashboard inbound traffic"
   vpc_id      = aws_vpc.bibbi-vpc.id
 
-  ingress {
-    description      = "ovpn Dashboard from VPC"
-    from_port        = 943
-    to_port          = 943
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-  }
-
-  egress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-  }
-
   tags = {
     Name = "allow_ovpn_dashboard"
   }
@@ -74,6 +57,29 @@ resource "aws_security_group_rule" "allow_ovpn_ssl" {
   from_port        = 443
   to_port          = 443
   protocol         = "tcp"
+  cidr_blocks      = ["0.0.0.0/0"]
+  ipv6_cidr_blocks = ["::/0"]
+  security_group_id = aws_security_group.allow_ovpn.id
+}
+
+resource "aws_security_group_rule" "allow_ovpn_dash" {
+  type = "ingress"
+  description      = "ovpn Dashboard from VPC"
+  from_port        = 943
+  to_port          = 943
+  protocol         = "tcp"
+  cidr_blocks      = ["0.0.0.0/0"]
+  ipv6_cidr_blocks = ["::/0"]
+  security_group_id = aws_security_group.allow_ovpn.id
+}
+
+
+resource "aws_security_group_rule" "allow_ovpn_eg" {
+  type = "egress"
+  description      = "egress for ovpn"
+  from_port        = 0
+  to_port          = 0
+  protocol         = "-1"
   cidr_blocks      = ["0.0.0.0/0"]
   ipv6_cidr_blocks = ["::/0"]
   security_group_id = aws_security_group.allow_ovpn.id

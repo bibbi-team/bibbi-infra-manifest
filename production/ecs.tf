@@ -52,9 +52,10 @@ resource "aws_ecs_task_definition" "bibbi-backend" {
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          "awslogs-group"         = "/ecs/"
+          "awslogs-group"         = "/ecs/bibbi-backend-prod"
           "awslogs-region"        = "ap-northeast-2"
-          "awslogs-stream-prefix" = "ecs"
+          "awslogs-stream-prefix" = "ecs",
+          "awslogs-create-group"= "true"
         }
       }
       secrets = [
@@ -114,6 +115,10 @@ resource "aws_ecs_service" "bibbi-backend" {
   launch_type     = "FARGATE"
   health_check_grace_period_seconds = 30
   #depends_on      = [aws_iam_role_policy.foo]
+  deployment_circuit_breaker {
+    enable = true
+    rollback = true
+  }
   depends_on = [aws_lb_listener.http_to_https, aws_lb_listener.https_forward, aws_iam_role_policy_attachment.ecs_task_execution_role]
   network_configuration {
     security_groups  = [aws_security_group.bibbi-prod-ecs-sg.id]
