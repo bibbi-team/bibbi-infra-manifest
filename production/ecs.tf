@@ -14,12 +14,6 @@ resource "aws_secretsmanager_secret" "bibbi-ecs-secret" {
 resource "aws_secretsmanager_secret_version" "bibbi-ecs-secret-version" {
   secret_id     = aws_secretsmanager_secret.bibbi-ecs-secret.id
   secret_string = jsonencode(local.container_secrets)
-
-  #  lifecycle {
-  #    ignore_changes = [
-  #      secret_string
-  #    ]
-  #  }
 }
 
 
@@ -33,7 +27,7 @@ resource "aws_ecs_task_definition" "bibbi-backend" {
   depends_on = [aws_secretsmanager_secret_version.bibbi-ecs-secret-version]
   lifecycle {
     ignore_changes = [
-
+      container_definitions
     ]
   }
   container_definitions = jsonencode([
@@ -101,7 +95,8 @@ data "aws_iam_policy_document" "secret_manager_policy" {
   statement {
     effect = "Allow"
     actions   = ["secretsmanager:GetSecretValue"]
-    resources = [aws_secretsmanager_secret.bibbi-ecs-secret.arn]
+    resources = [aws_secretsmanager_secret.bibbi-ecs-secret.arn,
+      aws_secretsmanager_secret.bibbi-ecs-secret-dev.arn]
   }
 }
 

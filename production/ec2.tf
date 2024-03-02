@@ -1,6 +1,6 @@
 resource "aws_instance" "vpn_bastion" {
-  ami           = "ami-0ba7b69b8b03f0bf1"
-  instance_type = "t2.small"
+  ami           = "ami-04599ab1182cd7961"
+  instance_type = "t2.micro"
   subnet_id = aws_subnet.public[0].id
   associate_public_ip_address = true
   security_groups = [aws_security_group.allow_ssh.id, aws_security_group.allow_ovpn.id]
@@ -11,6 +11,16 @@ resource "aws_instance" "vpn_bastion" {
 
   tags = {
     Name = "bastion-host"
+  }
+}
+
+resource "aws_eip" "bastion_ip" {
+  instance = aws_instance.vpn_bastion.id
+  domain   = "vpc"
+  depends_on = [aws_internet_gateway.igw]
+
+  tags = {
+    Name = "bastion-eip"
   }
 }
 
@@ -51,22 +61,12 @@ resource "aws_security_group" "allow_ovpn" {
   }
 }
 
-resource "aws_security_group_rule" "allow_ovpn_ssl" {
-  type = "ingress"
-  description      = "ovpn ssl from VPC"
-  from_port        = 443
-  to_port          = 443
-  protocol         = "tcp"
-  cidr_blocks      = ["0.0.0.0/0"]
-  ipv6_cidr_blocks = ["::/0"]
-  security_group_id = aws_security_group.allow_ovpn.id
-}
 
 resource "aws_security_group_rule" "allow_ovpn_dash" {
   type = "ingress"
   description      = "ovpn Dashboard from VPC"
-  from_port        = 943
-  to_port          = 943
+  from_port        = 1194
+  to_port          = 1194
   protocol         = "tcp"
   cidr_blocks      = ["0.0.0.0/0"]
   ipv6_cidr_blocks = ["::/0"]
