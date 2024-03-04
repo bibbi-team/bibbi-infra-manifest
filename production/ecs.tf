@@ -52,6 +52,10 @@ resource "aws_ecs_task_definition" "bibbi-backend" {
           "awslogs-create-group"= "true"
         }
       }
+      dockerLabels = {
+        "PROMETHEUS_EXPORTER_PATH" =  "/actuator/prometheus",
+        "PROMETHEUS_EXPORTER_PORT" = "8080"
+      }
       secrets = [
         for key, value in local.container_secrets :  {
           name      = key
