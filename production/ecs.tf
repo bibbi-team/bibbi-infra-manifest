@@ -205,6 +205,13 @@ resource "aws_security_group" "bibbi-prod-ecs-sg" {
     protocol        = "tcp"
   }
 
+  ingress {
+    protocol  = "tcp"
+    from_port       = local.container_port
+    to_port         = local.container_port
+    cidr_blocks      = ["10.0.0.0/16"]
+  }
+
   tags = {
     Name = "bibbi-prod-ecs-sg"
   }
